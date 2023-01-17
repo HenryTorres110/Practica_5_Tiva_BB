@@ -30,7 +30,7 @@
 extern void PWM_CONFIGURATION(int module, int divisor,  int freq, int f_clk, int duty_cycle)
 {
     SYSCTL->RCGCPWM |= (1 << module); // 0 o 1 para cada módulo
-    SYSCTL->RCGCGPIO |= 0x2; // Activamos puerto B, A corresponde a 0, B a 1 hasta F a 5.
+    SYSCTL->RCGCGPIO |= 0x2; // Activamos puerto B
     if (divisor == 0){
         SYSCTL->RCC &= ~0x00100000; // el bit 20 es el de USEPWMDIV
     }

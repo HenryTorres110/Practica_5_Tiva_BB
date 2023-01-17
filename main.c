@@ -51,29 +51,42 @@ int main(void)
  * usando un led RGB externa 
  *
  */
-    Configurar_PLL(_20MHZ);  //Configuracion de velocidad de reloj
+    uint32_t data[1];
+    int duty_cycle = 24;
+    int f_clk = 50000000;
+    int freq = 10000;
+    int divisor = 0;
+    int module = 0;
+
+    int CUENTAS; 
+    Configurar_PLL(_50MHZ);  //Configuracion de velocidad de reloj
     Configurar_GPIO();
     UART_2_CONFIG();
     ADC_CONFIGURATION();
     SEQ_CONFIGURATION();
-    unsigned int adc_read;  
-    //PWM_CONFIGURATION(0, 64, 50, 20000000, 72);
+    PWM_CONFIGURATION(module, divisor, freq, f_clk, duty_cycle);
+    //f_clk = f_clk / divisor;
     //PWM_CONFIGURATION(int module, int divisor, int freq, int f_clk, int duty_cycle)
     
     while (1){
-        ADC0 -> PSSI |= (1 << 3); //| (1 << 0);
+        /// Lectura del seq 3
+        //LECTURA_ADC_SEQ3(adc_read);
+        /*ADC0 -> PSSI |= (1 << 3); //| (1 << 0);
         while ((ADC0 -> RIS & 8) == 0);
-        adc_read = ADC0 -> SSFIFO3 & 0xFFFF;
+        data[0] = ADC0 -> SSFIFO3 & 0xFFFF;
         ADC0 -> ISC = 8; // Clearing 0b1000
-        if (adc_read < 2040){
+        if (data[0] < 2040){
             GPIOF -> DATA |= (1 << 1);
             GPIOF -> DATA &= ~(1 << 2); 
         }
-        else if (adc_read > 2040){
+        else if (data[0] > 2040){
             GPIOF -> DATA &= ~(1 << 1);
             GPIOF -> DATA |= (1 << 2);  
         }
 
-    }   
+        CUENTAS = (int)((1.0 - (data[0] / 4095.0)) *(f_clk / freq));
+        PWM0->_1_CMPA = CUENTAS;*/
+    } 
 }
+
 
