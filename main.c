@@ -29,6 +29,23 @@ char *inverting_name(char *name, int length){
     return &inverted_name[0];
 }
 
+extern void integer_to_char(uint32_t number)
+{
+    char number_in_string[5];
+    int i = 3;
+    int j = 0; 
+    int n_digit;  
+    while (i >= 0){
+        n_digit = (int)number / (int)(pow(10, i));
+        number_in_string[j] = n_digit + '0';
+        number = number - (n_digit * pow(10, i)); 
+        i = i - 1; 
+        j++;
+    }
+    number_in_string[4] = '\n';
+    printString(number_in_string);
+}
+
 int main(void)
 {
     //Experimento 1
@@ -51,41 +68,34 @@ int main(void)
  * usando un led RGB externa 
  *
  */
-    uint32_t data[1];
-    int duty_cycle = 24;
-    int f_clk = 50000000;
-    int freq = 10000;
-    int divisor = 0;
+    uint32_t data[5];
+    int duty_cycle = 85;
+    int f_clk = 20000000;
+    int freq = 50;
+    int divisor = 64;
     int module = 0;
-
-    int CUENTAS; 
-    Configurar_PLL(_50MHZ);  //Configuracion de velocidad de reloj
+    
+    uint32_t CUENTAS_0;
+    uint32_t CUENTAS_1;
+    uint32_t CUENTAS_2; 
+    Configurar_PLL(_20MHZ);  //Configuracion de velocidad de reloj
     Configurar_GPIO();
-    UART_2_CONFIG();
-    ADC_CONFIGURATION();
-    SEQ_CONFIGURATION();
-    PWM_CONFIGURATION(module, divisor, freq, f_clk, duty_cycle);
-    //f_clk = f_clk / divisor;
+    //UART_2_CONFIG();
+    ADC_CONFIGURATION(); // Puerto E y F pines E2 y E5
+    SEQ_CONFIGURATION_0();
+    PWM_CONFIGURATION(module, divisor, freq, f_clk, duty_cycle); // Puerto B pines B4 y B7
+    f_clk = f_clk / divisor;
     //PWM_CONFIGURATION(int module, int divisor, int freq, int f_clk, int duty_cycle)
     
     while (1){
-        /// Lectura del seq 3
-        //LECTURA_ADC_SEQ3(adc_read);
-        /*ADC0 -> PSSI |= (1 << 3); //| (1 << 0);
-        while ((ADC0 -> RIS & 8) == 0);
-        data[0] = ADC0 -> SSFIFO3 & 0xFFFF;
-        ADC0 -> ISC = 8; // Clearing 0b1000
-        if (data[0] < 2040){
-            GPIOF -> DATA |= (1 << 1);
-            GPIOF -> DATA &= ~(1 << 2); 
-        }
-        else if (data[0] > 2040){
-            GPIOF -> DATA &= ~(1 << 1);
-            GPIOF -> DATA |= (1 << 2);  
-        }
-
-        CUENTAS = (int)((1.0 - (data[0] / 4095.0)) *(f_clk / freq));
-        PWM0->_1_CMPA = CUENTAS;*/
+        // Lectura de varios canales
+        ADC_ISR_SEQ_0(data);
+        CUENTAS_0 = (uint32_t)((1.0 - (data[0] / 4095.0)) *(f_clk / freq));
+        CUENTAS_1 = (uint32_t)((1.0 - (data[1] / 4095.0)) *(f_clk / freq));
+        //CUENTAS_2 = (uint32_t)((1.0 - (data[2] / 4095.0)) *(f_clk / freq));
+        PWM0->_0_CMPB = CUENTAS_0;
+        PWM0->_1_CMPA = CUENTAS_1;
+        //PWM0->_2_CMPA = CUENTAS_2;
     } 
 }
 
