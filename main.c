@@ -74,6 +74,7 @@ int main(void)
     int freq = 50;
     int divisor = 64;
     int module = 0;
+    int servo = 1; // 1 for servo-mode and 0 for normal mode
     
     uint32_t CUENTAS_0;
     uint32_t CUENTAS_1;
@@ -90,9 +91,15 @@ int main(void)
     while (1){
         // Lectura de varios canales
         ADC_ISR_SEQ_0(data);
-        CUENTAS_0 = (uint32_t)((1.0 - (data[0] / 4095.0)) *(f_clk / freq));
-        CUENTAS_1 = (uint32_t)((1.0 - (data[1] / 4095.0)) *(f_clk / freq));
-        //CUENTAS_2 = (uint32_t)((1.0 - (data[2] / 4095.0)) *(f_clk / freq));
+        if (servo == 0){
+            CUENTAS_0 = (uint32_t)((1.0 - (data[0] / 4095.0)) *(f_clk / freq));
+            CUENTAS_1 = (uint32_t)((1.0 - (data[1] / 4095.0)) *(f_clk / freq));
+            //CUENTAS_2 = (uint32_t)((1.0 - (data[2] / 4095.0)) *(f_clk / freq));
+        }
+        else{
+            CUENTAS_0 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[0] / 4095.0) * 312);
+            CUENTAS_1 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[1] / 4095.0) * 312);
+        }
         PWM0->_0_CMPB = CUENTAS_0;
         PWM0->_1_CMPA = CUENTAS_1;
         //PWM0->_2_CMPA = CUENTAS_2;
