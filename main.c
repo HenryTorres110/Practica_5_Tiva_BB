@@ -80,9 +80,10 @@ int main(void)
     uint32_t CUENTAS_1;
     uint32_t CUENTAS_2; 
     Configurar_PLL(_20MHZ);  //Configuracion de velocidad de reloj
-    Configurar_GPIO();
-    //UART_2_CONFIG();
-    ADC_CONFIGURATION(); // Puerto E y F pines E2 y E5
+    //Configurar_GPIO();
+    //UART_2_CONFIG(); // Puerto D
+    //ADC_CONFIGURATION_PORT_D(); // PUERTO D PINES D0, D1, D2
+    ADC_CONFIGURATION_PORT_E(); // PUERTO E PINES E1, E2, E5
     SEQ_CONFIGURATION_0();
     PWM_CONFIGURATION(module, divisor, freq, f_clk, duty_cycle); // Puerto B pines B4 y B7
     f_clk = f_clk / divisor;
@@ -99,6 +100,7 @@ int main(void)
         else{
             CUENTAS_0 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[0] / 4095.0) * 312);
             CUENTAS_1 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[1] / 4095.0) * 312);
+            //CUENTAS_2 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[2] / 4095.0) * 312);
         }
         PWM0->_0_CMPB = CUENTAS_0;
         PWM0->_1_CMPA = CUENTAS_1;
