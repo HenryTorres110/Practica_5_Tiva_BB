@@ -3,7 +3,10 @@
 
 char *reading_string(char delimiter){
     char letter;
-    static char array[1024];
+    static char array[10];
+    for ( int i; i < 10; i++){
+        array[i]  = NULL;
+    }
     int counter = 0;
     letter = readChar();  
     while (letter != delimiter){
@@ -68,7 +71,7 @@ int main(void)
  *
  */
     uint32_t data[5];
-    int duty_cycle = 85;
+    int duty_cycle = 76;
     int f_clk = 20000000;
     int freq = 50;
     int divisor = 64;
@@ -78,7 +81,7 @@ int main(void)
     uint32_t CUENTAS_0;
     uint32_t CUENTAS_1;
     uint32_t CUENTAS_2; 
-    Configurar_PLL(_40MHZ);  //Configuracion de velocidad de reloj
+    Configurar_PLL(_20MHZ);  //Configuracion de velocidad de reloj
     //Configurar_GPIO();
     UART_2_CONFIG(); // Puerto D
     //ADC_CONFIGURATION_PORT_D(); // PUERTO D PINES D0, D1, D2
@@ -87,7 +90,6 @@ int main(void)
     PWM_CONFIGURATION(module, divisor, freq, f_clk, duty_cycle); // Puerto B pines B4 y B7
     f_clk = f_clk / divisor;
     //PWM_CONFIGURATION(int module, int divisor, int freq, int f_clk, int duty_cycle)
-    char color[7];
     while (1){
         // Lectura de varios canales
         //ADC_ISR_SEQ_0(data);
@@ -102,25 +104,28 @@ int main(void)
             //CUENTAS_2 = (uint32_t)(((1.0 - (5.0 / 100.0)) *(f_clk / freq)) - (data[2] / 4095.0) * 312);
         }
         else{
+            char color[7] = "";
             char *value_matlab = reading_string('\n');
             strcpy(color ,value_matlab);
+            char *knob_number = reading_string('\n');
+            int matlab_number = atoi(knob_number);
             if (strcmp(color, "Blue") == 0){
-                CUENTAS_0 = (uint32_t)((1.0 - (1000/ 100.0)) *(f_clk / freq));
-                f_clk = f_clk / divisor;// Operacion suficientemente grande para que no se brinque esta linea el programa
+                CUENTAS_0 = (uint32_t)((1.0 - (matlab_number / 100.0)) *(f_clk / freq));
             }
             else if (strcmp(color, "Red") == 0){
-
+                CUENTAS_1 = (uint32_t)((1.0 - (matlab_number / 100.0)) *(f_clk / freq));
             }
             else{
-                
+                //CUENTAS_2 = (uint32_t)((1.0 - (matlab_number / 100.0)) *(f_clk / freq));
             }
-            int matlab_number = atoi(value_matlab);
-            CUENTAS_0 = (uint32_t)((1.0 - (matlab_number / 100.0)) *(f_clk / freq));
         }
         PWM0->_0_CMPB = CUENTAS_0;
-        //PWM0->_1_CMPA = CUENTAS_1;
+        PWM0->_1_CMPA = CUENTAS_1;
         //PWM0->_2_CMPA = CUENTAS_2;
     } 
 }
 
 
+// Pin B4 --- Pin D0
+// Pin B7 ---- Pin D1
+// Pin E4 ---- Pin D2

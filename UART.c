@@ -44,12 +44,13 @@ extern void UART_2_CONFIG(void){
     GPIOD -> PCTL |= (GPIOD -> PCTL & 0x00FFFFFF) | 0x11000000; //(1 << 24) | (1 << 28); // 6 and 7
     GPIOD -> DEN = (1 << 6) | (1 << 7);
     // BAUD_RATE = 40,000,000  / (16 * 115200) = 21.70138889 ~ 22 
+    // 20 Mhz = 10.85069444444444444444444444
     // UARTFBRD[DIVFRAC] = integer(0.70138889 * 64 + 0.5) = 45.388 rounded --> 45
     UART2 -> CTL = (0 << 0) | (0 << 8) | (0 << 9); 
     // Integer portion of brd
-    UART2 -> IBRD = 21; 
+    UART2 -> IBRD = 10;//21; 
     // Fractional  portion of brd 
-    UART2 -> FBRD = 45; 
+    UART2 -> FBRD = 55;//45; 
     // Desired parameters 
     UART2 -> LCRH = (0x3 << 5) | (1<<4); // 8 bits, by default we get no parity and 1-stop bit and FIFO ENABLE
     UART2 -> CC = 0; //(0 << 0); // SYSTEM CLOCK 
